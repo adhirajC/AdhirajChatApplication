@@ -1,0 +1,72 @@
+extends layout
+
+block content
+  script(src='http://code.jquery.com/jquery-1.9.1.min.js')
+  script(src='/socket.io/socket.io.js')
+  script(src='https://rawgit.com/moment/moment/2.2.1/min/moment.min.js')
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(rel='stylesheet', href='/stylesheets/chat.css')
+  link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css")
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js")
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js")
+  .form-display
+    form(id="logout" action="/" method="GET")
+      input.logout-input(type="submit" value="Logout")
+  .chat-container    
+    #chat(style="height:28vw; overflow-y: auto; overflow-x: hidden; padding-left: 3px;")
+    form(id="messages-form" style="margin-top: 20px" action="javascript:void(0);")
+      input.messages-input(type="text" name="message" placeholder="Please Enter Your Message")
+      input.submit-input(type="submit" value="Submit" )
+  script. 
+    var socket = io();    
+    var username = !{username};
+
+    socket.on('connect', function () {
+      console.log(username);
+      socket.emit('all-chats');
+      });
+      
+    $( "#messages-form" ).submit(function(event) {
+    var data = $(this).serializeArray();
+    var docs =({
+      value: data[0].value,
+      username: username
+    });
+      socket.emit('show-message', docs);
+      });
+
+    socket.on('now-chat-return', function(doc){
+      appendMessage(doc);
+    });
+
+    socket.on('all-chats-return', function(docs){
+      for (var i = 0; i<docs.length; i++){
+      appendMessage(docs[i]);
+      }
+      });
+
+    function appendMessage (doc) {
+      var container = document.createElement("div"); 
+      var superContainer = document.createElement("div"); 
+      var nameContainer = document.createElement("div"); 
+      var dateContainer = document.createElement("div"); 
+      var messageSuperContainer = document.createElement("div"); 
+      var messageContainer = document.createElement("div");
+      var headerContainer = document.createElement("div");
+      $(container).addClass("container");
+      $(nameContainer).addClass("name-container");
+      $(messageContainer).addClass("message-container");
+      $(dateContainer).addClass("date-container");
+      nameContainer.innerText = doc.username;
+      dateContainer.innerText = doc.time;
+      messageContainer.innerText = doc.value;
+      headerContainer.append(nameContainer);
+      headerContainer.append(dateContainer);
+      container.append(headerContainer);
+      container.append(messageContainer);
+      superContainer.append(container);
+      $('#chat').append(superContainer);
+      }
+
+
+

@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css")
+  link(rel='stylesheet', href='/stylesheets/form.css')
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js")
+  script(src='/socket.io/socket.io.js')
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js")
+  -if(messages)
+        div.note #{messages}
+  div.login-form
+    p.chat-title 18-652 Chat Application
+    form.form-container(method="POST")
+      div.input-container
+        p.username-container Name:
+          input.username-input(type="text" required minlength="5" name="name" placeholder="Please Enter Your Username")
+        p.password-container Password:
+          input.password-input(type="text" required minlength="5" name="password" placeholder="Please Enter Your Password")
+      input.register-input(type="Submit" formaction="/register" value="Register")
+      input.login-input(type="Submit" formaction="/login" value="Login")
+
+  script.
+    var socket = io();  
+
+    socket.on('user-exists', function(doc){
+      alert("User already exists, please choose a different password");
+    });  
+    socket.on('wrong-password', function(doc){
+      alert("You entered the wrong password");
+    });  
+    socket.on('please-register', function(doc){
+      alert("There is no record of this user, please register");
+    });  
+    
